@@ -243,7 +243,6 @@ class ZipSign extends React.Component {
                 dsaContentHash,
                 privateKeyBuffer
               );
-              console.log("What is signature", dsaEcdSign.signature);
               let dsaFile = new Blob([dsaEcdSign.signature]);
               let signatureVerified = ethUtil.secp256k1.verify(
                 dsaContentHash,
@@ -261,7 +260,7 @@ class ZipSign extends React.Component {
                 metaFolder.file("sig-neopak.sf", signatureContent);
                 metaFolder.file("sig-neopak.ec", dsaFile);
                 Archive.archiveFiles(sequence.files, zip);
-                Archive.saveAs("neopak.zip", zip, () => {
+                Archive.saveAs("neopak.neo", zip, () => {
                   console.log("SAVED!");
                 });
               }
@@ -272,7 +271,6 @@ class ZipSign extends React.Component {
               var reader = new FileReader();
 
               reader.onload = function(e) {
-                console.log("file content:", e.target.result);
                 file.hash = ethUtil.sha256(e.target.result);
                 sequence.files.push(file);
                 sequence.next();
