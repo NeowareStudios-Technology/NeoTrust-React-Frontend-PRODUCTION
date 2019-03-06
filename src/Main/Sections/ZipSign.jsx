@@ -8,6 +8,7 @@
 import React from "react";
 // import classNames from 'classnames'
 import Dropzone from "react-dropzone";
+import DropzoneComponent from "react-dropzone-component";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import { TextField } from "@material-ui/core";
@@ -22,9 +23,10 @@ import CardFooter from "components/Card/CardFooter.jsx";
 import Sequencer from "components/Sequencer";
 import { archiveFiles } from "Archive/Archive.js";
 import Archive from "../../Archive/Archive";
-
+var ReactDOMServer = require("react-dom/server");
 var ethUtil = require("ethereumjs-util");
 
+require("react-dropzone-component/styles/filepicker.css");
 // ====================================
 //  ZipSign
 // ====================================
@@ -99,24 +101,26 @@ class ZipSign extends React.Component {
                       className="form-group"
                       style={{ marginBottom: "36px" }}
                     >
-                      <Dropzone
-                        onDrop={this.onDrop.bind(this)}
-                        onFileDialogCancel={this.onCancel.bind(this)}
-                      >
-                        {({ getRootProps, getInputProps }) => (
-                          <div {...getRootProps()}>
-                            <input {...getInputProps()} />
-                            <p>Drop files here, or click to select files</p>
-                            {this.state.errors && this.state.errors.files && (
-                              <>
-                                <p style={{ color: "red" }}>
-                                  {this.state.errors.files[0]}
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </Dropzone>
+                      <div>
+                        <Dropzone
+                          onDrop={this.onDrop.bind(this)}
+                          onFileDialogCancel={this.onCancel.bind(this)}
+                        >
+                          {({ getRootProps, getInputProps }) => (
+                            <div {...getRootProps()}>
+                              <input multiple {...getInputProps()} />
+                              <p>Drop files here, or click to select files</p>
+                              {this.state.errors && this.state.errors.files && (
+                                <>
+                                  <p style={{ color: "red" }}>
+                                    {this.state.errors.files[0]}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </Dropzone>
+                      </div>
                       <aside>
                         <h4>Files</h4>
                         <ul>{files}</ul>
@@ -208,7 +212,7 @@ class ZipSign extends React.Component {
 
               sequence.files.map(file => {
                 let fileEntries = [];
-                fileEntries.push("Name: " + file.path);
+                fileEntries.push("Name: " + file.name);
                 fileEntries.push("Digest-Algorithms: SHA256");
                 fileEntries.push("SHA256-Digest: " + file.hash.toString("hex"));
                 manifestContentParts.push("");
@@ -289,6 +293,10 @@ class ZipSign extends React.Component {
       this.setState({ errors: errors });
     }
   }
+}
+
+function FilePickerTemplate(props) {
+  return <>NO FILES</>;
 }
 
 // ====================================

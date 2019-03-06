@@ -90,7 +90,7 @@ class Component extends React.Component {
                       className="form-group"
                       style={{ marginBottom: "36px" }}
                     >
-                      <input type="file" onChange={this.onUpload} />
+                      <input type="file" onChange={this.onUpload} directory webkitdirectory multiple />
                       {this.state.errors && this.state.errors.archiveFile && (
                         <>
                           <p style={{ color: "red" }}>
