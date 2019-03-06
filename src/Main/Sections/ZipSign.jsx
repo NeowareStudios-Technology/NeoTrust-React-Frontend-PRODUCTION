@@ -100,7 +100,7 @@ class ZipSign extends React.Component {
                     </div>
                     <div
                       className="form-group"
-                      style={{ marginBottom: "24px" }}
+                      style={{ marginBottom: "24px", display: "none" }}
                     >
                       <TextField
                         value={this.state.fileName}
@@ -285,7 +285,7 @@ class ZipSign extends React.Component {
                 metaFolder.file("sig-neopak.sf", signatureContent);
                 metaFolder.file("sig-neopak.ec", dsaFile);
                 Archive.archiveFiles(sequence.files, zip);
-                Archive.saveAs(fileName + ".neo", zip, () => {
+                Archive.saveAs("neopak.zip", zip, () => {
                   console.log("SAVED!");
                 });
               }
