@@ -3,7 +3,7 @@
 //  NeoHdr
 //  Copyright (c) 2019 NeoWare, Inc. All rights reserved.
 // ======================================
-// jshint esversion: 6 
+// jshint esversion: 6
 
 import React from "react";
 // nodejs library that concatenates classes
@@ -13,7 +13,14 @@ import PropTypes from "prop-types";
 
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
-import { AppBar, Button, Drawer, Hidden, IconButton, Toolbar } from "@material-ui/core";
+import {
+  AppBar,
+  Button,
+  Drawer,
+  Hidden,
+  IconButton,
+  Toolbar
+} from "@material-ui/core";
 
 // @material-ui/icons
 import Menu from "@material-ui/icons/Menu";
@@ -32,7 +39,7 @@ import {
   drawerWidth
 } from "assets/jss/material-kit-react.jsx";
 
-import NeoSym from 'assets/img/NeoWareSymbol-256.png';
+import NeoSym from "assets/img/logo.png";
 
 // ====================================
 //  NeoHdr
@@ -96,7 +103,6 @@ class NeoHdr extends React.Component {
     const appBarClasses = classNames({
       [classes.appBar]: true,
       [classes[color]]: color,
-      [classes.absolute]: absolute,
       [classes.fixed]: fixed
     });
 
@@ -104,15 +110,7 @@ class NeoHdr extends React.Component {
       <AppBar className={appBarClasses}>
         <Toolbar className={classes.container}>
           <div className={classes.flex}>
-            <Button className={classes.title}>
-              {/* <SaveIcon className={classes.iconLarge} /> */}
-              <img
-                src={NeoSym}
-                className={classes.img}
-                alt="profile"
-              />
-              NeoPak
-            </Button>
+            <img src={NeoSym} className={classes.img} alt="profile" />
           </div>
 
           <Hidden smDown implementation="css">
@@ -203,7 +201,7 @@ const Styles = theme => ({
     border: "0",
     borderRadius: "3px",
     padding: "0.625rem 0",
-    marginBottom: "20px",
+    marginBottom: "0",
     color: "#555",
     width: "100%",
     backgroundColor: "#fff",
@@ -237,9 +235,11 @@ const Styles = theme => ({
     flex: 1
   },
   img: {
-    height: 40,
-    width: 42,
-    marginRight: 10,
+    height:"auto",
+    width: 300,
+    marginLeft: "auto",
+    marginRight: "auto",
+    display:"block"
   },
   title: {
     ...defaultFont,

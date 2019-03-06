@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import { createBrowserHistory } from "history";
 import { Router, Route, Switch } from "react-router-dom";
 
-import indexRoutes from "Routes.js";
 
+import indexRoutes from "Routes.js";
+import Styles from "components/Styles";
 import "assets/scss/material-kit-react.css";
 
 var hist = createBrowserHistory();

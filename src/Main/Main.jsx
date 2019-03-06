@@ -3,95 +3,63 @@
 //  Main.jsx
 //  Copyright (c) 2019 NeoWare, Inc. All rights reserved.
 // ======================================
-// jshint esversion: 6 
+// jshint esversion: 6
 
 import React from "react";
 
 // @material-ui/core components
+import { AppBar, Tabs, Tab, Paper } from "@material-ui/core";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { container } from "assets/jss/material-kit-react.jsx";
-import bkgImg from "assets/img/bg7.jpg";
-
+import Styles from "components/Styles";
 // core components
 import NeoHdr from "components/Header/NeoHdr.jsx";
 // import HeaderLinks from "components/Header/HeaderLinks.jsx";
 import Footer from "components/Footer/Footer.jsx";
+import bkgImg from "assets/img/bg7.jpg";
+import GridContainer from "components/Grid/GridContainer.jsx";
+import GridItem from "components/Grid/GridItem.jsx";
 
 // Sections
 import ZipSign from "./Sections/ZipSign.jsx";
-
+import ZipVerify from "routes/verify";
 // ====================================
 //  MainPage
 // ====================================
 
 class MainPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeTab: 0
+    };
+  }
+
+  onTabChange = (e, tab) => {
+    this.setState({ activeTab: tab });
+  };
   render() {
     const { classes } = this.props;
     return (
       <div>
-        <NeoHdr
-          absolute
-          color="transparent"
-        />
-        <div
-          className={classes.pageHeader}
-          style={{
-            backgroundImage: "url(" + bkgImg + ")",
-            backgroundSize: "cover",
-            backgroundPosition: "top center"
-          }}
-        >
-          <ZipSign />
-          <Footer whiteFont />
+        <NeoHdr absolute color="transparent" />
+        <div className={Styles.pageHeader} style={{}}>
+          <GridContainer justify="center">
+            <GridItem xs={12} sm={12} md={10} lg={8}>
+              <Paper style={{ marginBottom: "72px" }}>
+                <Tabs value={this.state.activeTab} onChange={this.onTabChange}>
+                  <Tab label="Create Archive File" />
+                  <Tab label="Verify Archive File" />
+                </Tabs>
+              </Paper>
+              {this.state.activeTab === 0 && <ZipSign />}
+              {this.state.activeTab === 1 && <ZipVerify />}
+            </GridItem>
+          </GridContainer>
         </div>
+        <Footer whiteFont />
       </div>
     );
   }
 }
-
-// ====================================
-//  MainPage
-// ====================================
-
-const Styles = theme => ({
-  container: {
-    ...container,
-    zIndex: "2",
-    position: "relative",
-    paddingTop: "20vh",
-    color: "#FFFFFF"
-  },
-  pageHeader: {
-    minHeight: "100vh",
-    height: "auto",
-    display: "inherit",
-    position: "relative",
-    margin: "0",
-    padding: "0",
-    border: "0",
-    alignItems: "center",
-    "&:before": {
-      background: "rgba(0, 0, 0, 0.5)"
-    },
-    "&:before,&:after": {
-      position: "absolute",
-      zIndex: "1",
-      width: "100%",
-      height: "100%",
-      display: "block",
-      left: "0",
-      top: "0",
-      content: '""'
-    },
-    "& footer li a,& footer li a:hover,& footer li a:active": {
-      color: "#FFFFFF"
-    },
-    "& footer": {
-      position: "absolute",
-      bottom: "0",
-      width: "100%",
-    }
-  },
-});
 
 export default withStyles(Styles)(MainPage);
