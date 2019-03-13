@@ -18,7 +18,7 @@ import Footer from "components/Footer/Footer.jsx";
 import bkgImg from "assets/img/bg7.jpg";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
-
+import 'bootstrap/dist/css/bootstrap.css';
 // Sections
 import ZipSign from "./Sections/ZipSign.jsx";
 import ZipVerify from "routes/verify";
