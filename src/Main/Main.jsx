@@ -21,7 +21,8 @@ import GridItem from "components/Grid/GridItem.jsx";
 import 'bootstrap/dist/css/bootstrap.css';
 // Sections
 import ZipSign from "./Sections/ZipSign.jsx";
-import ZipVerify from "routes/verify";
+import ZipVerify from "./Sections/ZipVerify.jsx";
+import GenerateKeystore from "./Sections/GenerateKeystore.jsx";
 // ====================================
 //  MainPage
 // ====================================
@@ -49,10 +50,12 @@ class MainPage extends React.Component {
                 <Tabs value={this.state.activeTab} onChange={this.onTabChange}>
                   <Tab label="Create Archive File" />
                   <Tab label="Verify Archive File" />
+                  <Tab label="Generate NeoPak Id" />
                 </Tabs>
               </Paper>
               {this.state.activeTab === 0 && <ZipSign />}
               {this.state.activeTab === 1 && <ZipVerify />}
+              {this.state.activeTab === 2 && <GenerateKeystore />}
             </GridItem>
           </GridContainer>
         </div>

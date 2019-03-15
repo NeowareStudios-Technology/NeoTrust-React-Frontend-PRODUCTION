@@ -66,7 +66,7 @@ class ZipSign extends React.Component {
       keystoreFileActiveTab: 0,
       keystorePassword: "",
       creatingKeystoreFile: false,
-      transactionHash:null,
+      transactionHash: null,
       validatingKeystoreFile: false
     };
   }
@@ -201,7 +201,6 @@ class ZipSign extends React.Component {
             signatureContentParts[4] =
               "SHA256-Digest: " + manifestFileHash.toString("hex");
 
-              
             signatureContent = signatureContentParts.join("\n");
             let dsaContentHash = ethUtil.sha256(signatureContent);
             let dsaEcdSign = ethUtil.secp256k1.sign(
@@ -256,9 +255,10 @@ class ZipSign extends React.Component {
 
           let web3 = new Web3(
             // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
-            new Web3.providers.WebsocketProvider("wss://ropsten.infura.io/ws/v3/"+projectId)
+            new Web3.providers.WebsocketProvider(
+              "wss://ropsten.infura.io/ws/v3/" + projectId
+            )
           );
-
 
           let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
           //Use hash of signature content instead of manifestContent and call it
@@ -268,16 +268,19 @@ class ZipSign extends React.Component {
             manifestHash: ethUtil.sha256(input.manifestContent).toString("hex")
           };
 
-          let fromAddress = ethUtil.privateToAddress(privateKeyBuffer).toString("hex");
-          let transactionCount = await web3.eth.getTransactionCount(fromAddress);
+          let fromAddress = ethUtil
+            .privateToAddress(privateKeyBuffer)
+            .toString("hex");
+          let transactionCount = await web3.eth.getTransactionCount(
+            fromAddress
+          );
 
           let dataString = JSON.stringify(rawData);
           let dataBuffer = ethUtil.toBuffer(dataString);
           let dataHex = ethUtil.bufferToHex(dataBuffer);
-          
 
           let transactionParams = {
-            nonce:"0x"+transactionCount.toString(16),
+            nonce: "0x" + transactionCount.toString(16),
             to: neoKeyAddress,
             data: dataHex
             // gasPrice: gasPriceHex,
@@ -288,12 +291,12 @@ class ZipSign extends React.Component {
           let baseFee = estimatingTransaction.getBaseFee().toNumber();
 
           let gasPrice = 100000;
-          let gasPriceHex = "0x"+gasPrice.toString(16);
-          console.log("Gas Price",gasPriceHex);
+          let gasPriceHex = "0x" + gasPrice.toString(16);
+          console.log("Gas Price", gasPriceHex);
 
           let gasLimit = baseFee;
-          let gasLimitHex = "0x"+gasLimit.toString(16);
-          console.log("Gas Limit",gasLimitHex);
+          let gasLimitHex = "0x" + gasLimit.toString(16);
+          console.log("Gas Limit", gasLimitHex);
 
           transactionParams.gasPrice = gasPriceHex;
           transactionParams.gasLimit = gasLimitHex;
@@ -301,33 +304,31 @@ class ZipSign extends React.Component {
           transaction.sign(privateKeyBuffer);
 
           let transactionValid = transaction.validate();
-          console.log("Transaction Valid",transactionValid);  
-          if(!transactionValid){
+          console.log("Transaction Valid", transactionValid);
+          if (!transactionValid) {
             let validationError = transaction.validate(true);
-            console.log("Validation Error",validationError);
+            console.log("Validation Error", validationError);
           }
 
-          
           const serializedTransaction = transaction.serialize();
 
-          let transactionHash = "0x"+serializedTransaction.toString("hex");
+          let transactionHash = "0x" + serializedTransaction.toString("hex");
 
-
-          web3.eth.sendSignedTransaction(transactionHash)
-          .on("error",(error)=>{
-            console.log("Error sending transaction:",error)
-          })
-          .on('transactionHash', (hash)=>{
-            this.setState({
-              transactionHash:hash
-            },()=>{
-              this.downloadZipFile();
+          web3.eth
+            .sendSignedTransaction(transactionHash)
+            .on("error", error => {
+              console.log("Error sending transaction:", error);
             })
-          })
-
-
-
-
+            .on("transactionHash", hash => {
+              this.setState(
+                {
+                  transactionHash: hash
+                },
+                () => {
+                  this.downloadZipFile();
+                }
+              );
+            });
         }
       }
     }
@@ -576,134 +577,69 @@ class ZipSign extends React.Component {
             <div>
               <Stepper activeStep={activeStep} orientation="vertical">
                 <Step key="password-or-file">
-                  <StepLabel>Keystore File</StepLabel>
+                  <StepLabel>Upload your NeoPak Id</StepLabel>
                   <StepContent>
                     <div className="px-4 pt-4 pb-4">
-                      <Tabs
-                        className="mb-4"
-                        value={this.state.keystoreFileActiveTab}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        onChange={(e, tab) => {
-                          this.setState({ keystoreFileActiveTab: tab });
-                        }}
-                      >
-                        <Tab label="Create New Keystore File" />
-                        <Tab label="Use Saved Keystore File" />
-                      </Tabs>
                       <div>
-                        {this.state.keystoreFileActiveTab === 0 && (
-                          <>
-                            <div className="form-group mb-4">
-                              <TextField
-                                label="Password"
-                                type="password"
-                                placeholder="Enter a password for your new keystore file."
-                                helperText="Enter a password for your new keystore file."
-                                value={this.state.password}
-                                onChange={e => {
-                                  let value = e.target.value;
-                                  this.setState({ password: value });
-                                }}
-                                fullWidth
-                              />
-                              {this.state.errors && this.state.errors.password && (
-                                <>
-                                  <p style={{ color: "red" }}>
-                                    {this.state.errors.password[0]}
-                                  </p>
-                                </>
-                              )}
-                              <div className="mt-4">
-                                {this.state.creatingKeystoreFile ? (
-                                  <>
-                                    <Button
-                                      disabled
-                                      contained="true"
-                                      color="primary"
-                                      onClick={this.createKeystoreFile}
-                                    >
-                                      Creating Keystore File
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Button
-                                      contained="true"
-                                      color="primary"
-                                      onClick={this.createKeystoreFile}
-                                    >
-                                      Create Keystore File
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </>
-                        )}
-                        {this.state.keystoreFileActiveTab === 1 && (
-                          <>
-                            <div className="form-group mb-4">
-                              <TextField
-                                label="Keystore File Password"
-                                type="password"
-                                placeholder="Enter the keystore file password."
-                                value={this.state.keystorePassword}
-                                onChange={e => {
-                                  let value = e.target.value;
-                                  this.setState({ keystorePassword: value });
-                                }}
-                                fullWidth
-                              />
-                              {this.state.errors &&
-                                this.state.errors.keystorePassword && (
-                                  <>
-                                    <p style={{ color: "red" }}>
-                                      {this.state.errors.keystorePassword[0]}
-                                    </p>
-                                  </>
-                                )}
-                            </div>
-                            <div className="form-group mb-4">
-                              <label>Upload Your Keystore File</label>
-                              <div>
-                                <input
-                                  title="Keystore File"
-                                  type="file"
-                                  onChange={this.onKeystoreUpload}
-                                />
-                              </div>
-                              {this.state.errors &&
-                                this.state.errors.archiveFile && (
-                                  <>
-                                    <p style={{ color: "red" }}>
-                                      {this.state.errors.archiveFile[0]}
-                                    </p>
-                                  </>
-                                )}
-                            </div>
-                            <div>
-                              {this.state.validatingKeystoreFile ? (
-                                <>
-                                  <Button contained="true" disabled color="primary">
-                                    Validating Keystore File ...
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  {" "}
-                                  <Button
-                                    contained="true"
-                                    color="primary"
-                                    onClick={this.validateKeystoreFile}
-                                  >
-                                    Validate Keystore File
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </>
-                        )}
+                        <div className="form-group mb-4">
+                          <TextField
+                            label="NeoPak Id Password"
+                            type="password"
+                            placeholder="Enter your NeoPak Id password."
+                            value={this.state.keystorePassword}
+                            onChange={e => {
+                              let value = e.target.value;
+                              this.setState({ keystorePassword: value });
+                            }}
+                            fullWidth
+                          />
+                          {this.state.errors &&
+                            this.state.errors.keystorePassword && (
+                              <>
+                                <p style={{ color: "red" }}>
+                                  {this.state.errors.keystorePassword[0]}
+                                </p>
+                              </>
+                            )}
+                        </div>
+                        <div className="form-group mb-4">
+                          <label>Upload Your NeoPak Id</label>
+                          <div>
+                            <input
+                              title="NeoPak Id"
+                              type="file"
+                              onChange={this.onKeystoreUpload}
+                            />
+                          </div>
+                          {this.state.errors && this.state.errors.archiveFile && (
+                            <>
+                              <p style={{ color: "red" }}>
+                                {this.state.errors.archiveFile[0]}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                        <div>
+                          {this.state.validatingKeystoreFile ? (
+                            <>
+                              <Button contained="true" disabled color="primary">
+                                Validating NeoPak Id...
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {" "}
+                              <Button
+                                contained="true"
+                                color="primary"
+                                onClick={this.validateKeystoreFile}
+                              >
+                                Upload NeoPak Id
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      
                       </div>
                     </div>
                   </StepContent>
@@ -768,8 +704,17 @@ class ZipSign extends React.Component {
                   <StepLabel>Create and Download Neopak File</StepLabel>
                   <StepContent>
                     <div className="px-4 pt-4 pb-4">
-                      {this.state.filesInArchive ? (
+                      {this.state.filesInArchive &&
+                      this.state.transactionHash ? (
                         <>
+                          <h3>
+                            This is your transaction hash:{" "}
+                            {this.state.transactionHash}
+                          </h3>
+                          <h4>
+                            Your NeoPak can be verified once Ethereum processes
+                            the transaction.
+                          </h4>
                           <Button
                             contained="true"
                             color="primary"
@@ -781,7 +726,13 @@ class ZipSign extends React.Component {
                       ) : (
                         <>
                           <div>
-                            <h4>Creating Neopak File...<strong>Please do not close the browser until further notice.</strong></h4>
+                            <h4>
+                              Creating Neopak File...
+                              <strong>
+                                Please do not close the browser until further
+                                notice.
+                              </strong>
+                            </h4>
                           </div>
                         </>
                       )}
