@@ -322,8 +322,10 @@ class ZipSign extends React.Component {
                           add ether.
                         </h4>
                         <h4>
-                          Once your address has funds you can create NeoPak
-                          files.
+                          You can now add Ether to your address using this
+                          keystore file. Once your address has enough ether you
+                          can come back and use this keystore file to create
+                          NeoPak files.
                         </h4>
                         <Button
                           variant="contained"

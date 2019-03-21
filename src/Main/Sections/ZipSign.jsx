@@ -42,6 +42,8 @@ const keythereum = require("keythereum");
 
 require("react-dropzone-component/styles/filepicker.css");
 
+// const Web3 = window.Web3;
+
 // ====================================
 //  ZipSign
 // ====================================
@@ -67,6 +69,7 @@ class ZipSign extends React.Component {
       keystorePassword: "",
       creatingKeystoreFile: false,
       transactionHash: null,
+      transactionError: null,
       validatingKeystoreFile: false
     };
   }
@@ -251,14 +254,14 @@ class ZipSign extends React.Component {
         if (privateKey) {
           let projectId = "16b625506d4a427b9548ed443b66858b";
 
-          // let web3 = new Web3("https://ropsten.infura.io/v3/"+projectId);
+          let web3 = new Web3("https://ropsten.infura.io/v3/" + projectId);
 
-          let web3 = new Web3(
-            // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
-            new Web3.providers.WebsocketProvider(
-              "wss://ropsten.infura.io/ws/v3/" + projectId
-            )
-          );
+          // let web3 = new Web3(
+          //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
+          //   new Web3.providers.WebsocketProvider(
+          //     "wss://ropsten.infura.io/ws/v3/" + projectId
+          //   )
+          // );
 
           let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
           //Use hash of signature content instead of manifestContent and call it
@@ -317,7 +320,29 @@ class ZipSign extends React.Component {
           web3.eth
             .sendSignedTransaction(transactionHash)
             .on("error", error => {
-              console.log("Error sending transaction:", error);
+              let errorMessage =
+                "We could not process your transaction.  Please kindly verify that the address associated with your keystore file has enough funds.";
+              if (
+                typeof error === "object" &&
+                typeof error.message !== "undefined"
+              ) {
+                let messageParts = error.message.split(":");
+                try {
+                  let messageObject = JSON.parse(messageParts[1].trim);
+                  if (
+                    messageObject &&
+                    typeof messageObject.message !== "undefined"
+                  ) {
+                    errorMessage =
+                      "We could not process your transaction. " +
+                      messageObject.message.charAt(0).toUpperCase() +
+                      messageObject.message.slice(1);
+                  }
+                } catch (error) {}
+              }
+              this.setState({
+                transactionError: errorMessage
+              });
             })
             .on("transactionHash", hash => {
               this.setState(
@@ -639,7 +664,6 @@ class ZipSign extends React.Component {
                             </>
                           )}
                         </div>
-                      
                       </div>
                     </div>
                   </StepContent>
@@ -704,24 +728,35 @@ class ZipSign extends React.Component {
                   <StepLabel>Create and Download Neopak File</StepLabel>
                   <StepContent>
                     <div className="px-4 pt-4 pb-4">
-                      {this.state.filesInArchive &&
-                      this.state.transactionHash ? (
+                      {this.state.filesInArchive ? (
                         <>
-                          <h3>
-                            This is your transaction hash:{" "}
-                            {this.state.transactionHash}
-                          </h3>
-                          <h4>
-                            Your NeoPak can be verified once Ethereum processes
-                            the transaction.
-                          </h4>
-                          <Button
-                            contained="true"
-                            color="primary"
-                            onClick={this.downloadZipFile}
-                          >
-                            Download Neopak File
-                          </Button>
+                          {this.state.transactionHash && (
+                            <>
+                              {" "}
+                              <h3>
+                                This is your transaction hash:{" "}
+                                {this.state.transactionHash}
+                              </h3>
+                              <h4>
+                                Your NeoPak can be verified once Ethereum
+                                processes the transaction.
+                              </h4>
+                              <Button
+                                contained="true"
+                                color="primary"
+                                onClick={this.downloadZipFile}
+                              >
+                                Download Neopak File
+                              </Button>
+                            </>
+                          )}
+                          {this.state.transactionError && (
+                            <>
+                              <h3 className="text-danger">
+                                {this.state.transactionError}
+                              </h3>
+                            </>
+                          )}
                         </>
                       ) : (
                         <>
