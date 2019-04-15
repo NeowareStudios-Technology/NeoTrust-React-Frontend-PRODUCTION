@@ -23,23 +23,27 @@ body, h1, h2, h3, h4, h5, h6 {
   line-height: 1.5em; }
 
 h1, h2, h3, h4, h5, h6 {
-  color: inherit; }
+  color: 'white'; }
 
 h1, h2, h3 {
   margin-top: 20px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  color: 'white'; }
 
 h4, h5, h6 {
   margin-top: 10px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  color: 'white'; }
 
 h1 {
   font-size: 3.3125rem;
-  line-height: 1.15em; }
+  line-height: 1.15em;
+   }
 
 h2 {
   font-size: 2.25rem;
-  line-height: 1.5em; }
+  line-height: 1.5em;
+  color: white; }
 
 h3 {
   font-size: 1.5625rem;
@@ -60,7 +64,8 @@ h6 {
 
 p {
   font-size: 14px;
-  margin: 0 0 10px; }
+  margin: 0 0 10px;
+  color: '#000'; }
 
 html {
   font-family: sans-serif;
@@ -71,8 +76,8 @@ html {
   -webkit-tap-highlight-color: transparent; }
 
 body {
-  background-color: #E5E5E5;
-  color: #3C4858;
+  background-color: #000;
+  color: #000;
   margin: 0;
   font-size: 1rem;
   text-align: left; }
@@ -108,7 +113,8 @@ small {
 
 img {
   vertical-align: middle;
-  border-style: none; }
+  border-style: none;
+  width: 50%; }
 
 form {
   margin-bottom: 1.125rem; }
