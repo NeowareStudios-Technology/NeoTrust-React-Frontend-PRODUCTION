@@ -235,6 +235,8 @@ const Styles = theme => ({
     flex: 1
   },
   img: {
+    paddingTop: '50px',
+    paddingBottom: '50px',
     height:"auto",
     width: 300,
     marginLeft: "auto",

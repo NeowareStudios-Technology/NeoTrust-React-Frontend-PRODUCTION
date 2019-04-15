@@ -25,13 +25,13 @@ function Footer({ ...props }) {
     <footer className={footerClasses}>
       <div className={classes.container}>
         <div className={classes.right}>
-          Copyright &copy; {1900 + new Date().getYear()}, by{" "}
+          Copyright &copy; {1900 + new Date().getYear()} by{" "}
           <a
             href="https://www.neoware.io"
             className={aClasses}
             target="_blank"
           >
-            NeoWare, Inc.
+            NeoWare Inc.
           </a>
         </div>
       </div>

@@ -1,5 +1,5 @@
 // ======================================
-//	NeoPak.io
+//	NeoTrust.io
 //  ZipSign.jsx
 //  Copyright (c) 2019 NeoWare, Inc. All rights reserved.
 // ======================================
@@ -55,7 +55,7 @@ class Component extends React.Component {
       <div className={classes.container}>
         <Card>
           <form className={classes.form}>
-            <CardHeader color="primary" className={classes.cardHeader}>
+            <CardHeader color="white" className={classes.cardHeader}>
               <h4>Verify A Signed Archive File</h4>
             </CardHeader>
             <CardBody>
