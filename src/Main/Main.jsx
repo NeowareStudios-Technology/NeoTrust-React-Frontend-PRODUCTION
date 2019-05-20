@@ -50,7 +50,6 @@ class MainPage extends React.Component {
     };
   }
 
-
   onTabChange = (e, tab) => {
     this.setState({ activeTab: tab });
   };
@@ -61,27 +60,25 @@ class MainPage extends React.Component {
         <NeoHdr absolute color="transparent" />
         <div className={Styles.pageHeader} style={{}}>
           <GridContainer justify="center">
-
-              <>
-                {" "}
-                <GridItem xs={12} sm={12} md={10} lg={8}>
-                  <Paper style={{ marginBottom: "72px" }}>
-                    <Tabs
-                      value={this.state.activeTab}
-                      onChange={this.onTabChange}
-                    >
-                      <Tab label="Create Archive File" />
-                      <Tab label="Verify Archive File" />
-                      <Tab label="Generate NeoTrust ID" />
-
-                    </Tabs>
-                  </Paper>
-                  {this.state.activeTab === 0 && <ZipSign />}
-                  {this.state.activeTab === 1 && <ZipVerify />}
-                  {this.state.activeTab === 2 && <GenerateKeystore />}
-                </GridItem>
-              </>
-          
+            <>
+              {" "}
+              <GridItem xs={12} sm={12} md={10} lg={8}>
+                <Paper style={{ marginBottom: "72px" }}>
+                  <Tabs
+                    value={this.state.activeTab}
+                    onChange={this.onTabChange}
+                  >
+                    <Tab label="Create Archive File" />
+                    <Tab label="Verify Archive File" />
+                    <Tab label="Generate NeoTrust ID" />
+                    <Tab label="Certify Identity" />
+                  </Tabs>
+                </Paper>
+                {this.state.activeTab === 0 && <ZipSign />}
+                {this.state.activeTab === 1 && <ZipVerify />}
+                {this.state.activeTab === 2 && <GenerateKeystore />}
+              </GridItem>
+            </>
           </GridContainer>
         </div>
         <Footer whiteFont />
