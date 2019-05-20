@@ -225,7 +225,7 @@ class GenerateKeystore extends React.Component {
 
     //Lee 5/20/19
     //send transaction from NeoTrust Ethereum address to users newly created NeoTrust ID (eth address)
-    sequence.promise(async () => {
+    sequence.promise(async (input, callback) => {
       let privateKeyData = sequence.privateKeyData;
       if (privateKeyData) {
         let privateKeyBuffer = Buffer.from(privateKeyData.privateKey, "hex");
@@ -243,7 +243,16 @@ class GenerateKeystore extends React.Component {
             //   )
             // );
 
-            //this is a test address DO NOT USE FOR PRODUCTION
+            let toAddress = ethUtil
+              .privateToAddress(privateKeyBuffer)
+              .toString("hex");
+
+            toAddress = "0x" + toAddress;
+
+            let rawData = {
+              userName: "bob"
+            };
+
             let neoTrustPrivKeyBuffer = new Buffer([
               0x0e,
               0x8b,
@@ -279,18 +288,9 @@ class GenerateKeystore extends React.Component {
               0xbf
             ]);
 
-            //put user name in raw data of transaction
-            //TO DO: fill in name with real name from user input
-            let rawData = { userName: "Bob Todd" };
-
-            let toAddress = ethUtil
-              .privateToAddress(privateKeyBuffer)
-              .toString("hex");
-
             let fromAddress = ethUtil
               .privateToAddress(neoTrustPrivKeyBuffer)
               .toString("hex");
-
             let transactionCount = await web3.eth.getTransactionCount(
               fromAddress
             );
@@ -303,8 +303,6 @@ class GenerateKeystore extends React.Component {
               nonce: "0x" + transactionCount.toString(16),
               to: toAddress,
               data: dataHex
-              // gasPrice: gasPriceHex,
-              // gasLimit: gasLimit
             };
             let estimatingTransaction = new EthereumTx(transactionParams);
             estimatingTransaction.sign(privateKeyBuffer);
@@ -321,7 +319,7 @@ class GenerateKeystore extends React.Component {
             transactionParams.gasPrice = gasPriceHex;
             transactionParams.gasLimit = gasLimitHex;
             let transaction = new EthereumTx(transactionParams);
-            transaction.sign(privateKeyBuffer);
+            transaction.sign(neoTrustPrivKeyBuffer);
 
             let transactionValid = transaction.validate();
             console.log("Transaction Valid", transactionValid);
@@ -365,6 +363,9 @@ class GenerateKeystore extends React.Component {
                 this.setState({
                   transactionHash: hash
                 });
+                console.log("ID certification transaction sent to new user");
+                console.log("transaction hash " + hash);
+                sequence.next();
               });
           }
         }

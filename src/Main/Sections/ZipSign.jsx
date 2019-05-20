@@ -136,6 +136,9 @@ class ZipSign extends React.Component {
     let files = this.state.files;
     let privateKeyData = this.state.privateKeyData;
     let publicKeyBuffer = null;
+
+    console.log(privateKeyData.privateKey.toString("hex"));
+
     if (privateKeyData) {
       if (files.length > 0) {
         let privateKeyBuffer = Buffer.from(privateKeyData.privateKey, "hex");
