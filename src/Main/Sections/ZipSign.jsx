@@ -267,7 +267,7 @@ class ZipSign extends React.Component {
           //Use hash of signature content instead of manifestContent and call it
           //signatureHash
           let rawData = {
-            publicKey: input.publicKeyBuffer.toString("hex"),
+            //publicKey: input.publicKeyBuffer.toString("hex"),
             manifestHash: ethUtil.sha256(input.manifestContent).toString("hex")
           };
 
