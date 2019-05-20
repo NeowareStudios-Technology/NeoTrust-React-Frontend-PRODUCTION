@@ -71,7 +71,6 @@ class MainPage extends React.Component {
                     <Tab label="Create Archive File" />
                     <Tab label="Verify Archive File" />
                     <Tab label="Generate NeoTrust ID" />
-                    <Tab label="Certify Identity" />
                   </Tabs>
                 </Paper>
                 {this.state.activeTab === 0 && <ZipSign />}
