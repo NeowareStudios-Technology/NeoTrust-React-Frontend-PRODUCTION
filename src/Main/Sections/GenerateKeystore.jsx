@@ -46,7 +46,7 @@ require("react-dropzone-component/styles/filepicker.css");
 //  ZipSign
 // ====================================
 
-class ZipSign extends React.Component {
+class GenerateKeystore extends React.Component {
   constructor() {
     super();
 
@@ -437,4 +437,4 @@ const Styles = theme => ({
   }
 });
 
-export default withStyles(Styles)(ZipSign);
+export default withStyles(Styles)(GenerateKeystore);

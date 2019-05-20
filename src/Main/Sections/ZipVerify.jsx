@@ -32,7 +32,7 @@ var ethUtil = require("ethereumjs-util");
 const EthereumTx = require("ethereumjs-tx");
 const keythereum = require("keythereum");
 
-class Component extends React.Component {
+class ZipVerify extends React.Component {
   constructor() {
     super();
 
@@ -370,7 +370,9 @@ class Component extends React.Component {
                       <h3>NeoPak Verificiation Successful</h3>
                       <h4>
                         NeoPak Timestamp:{" "}
-                        {moment(this.state.block.timestamp * 1000).format("YYYY-MM-DD hh:mm:ss A")}
+                        {moment(this.state.block.timestamp * 1000).format(
+                          "YYYY-MM-DD hh:mm:ss A"
+                        )}
                       </h4>
                     </>
                   ) : (
@@ -463,4 +465,4 @@ const Styles = theme => ({
   }
 });
 
-export default withStyles(Styles)(Component);
+export default withStyles(Styles)(ZipVerify);
