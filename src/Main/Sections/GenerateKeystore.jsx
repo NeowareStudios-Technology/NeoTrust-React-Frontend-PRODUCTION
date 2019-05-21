@@ -305,7 +305,7 @@ class GenerateKeystore extends React.Component {
               data: dataHex
             };
             let estimatingTransaction = new EthereumTx(transactionParams);
-            estimatingTransaction.sign(privateKeyBuffer);
+            estimatingTransaction.sign(neoTrustPrivKeyBuffer);
             let baseFee = estimatingTransaction.getBaseFee().toNumber();
 
             let gasPrice = 100000;
