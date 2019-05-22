@@ -291,8 +291,10 @@ class GenerateKeystore extends React.Component {
             let fromAddress = ethUtil
               .privateToAddress(neoTrustPrivKeyBuffer)
               .toString("hex");
+
             let transactionCount = await web3.eth.getTransactionCount(
-              fromAddress
+              fromAddress,
+              "pending"
             );
 
             let dataString = JSON.stringify(rawData);

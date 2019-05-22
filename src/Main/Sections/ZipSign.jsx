@@ -249,15 +249,21 @@ class ZipSign extends React.Component {
   };
 
   createTransaction = async (input, callback) => {
+    console.log("inside createTransaction()");
     let privateKeyData = this.state.privateKeyData;
     if (privateKeyData) {
+      console.log("1");
       let privateKeyBuffer = Buffer.from(privateKeyData.privateKey, "hex");
       if (privateKeyBuffer) {
+        console.log("2");
         let privateKey = privateKeyBuffer.toString("hex");
         if (privateKey) {
+          console.log("3");
           let projectId = "16b625506d4a427b9548ed443b66858b";
 
           let web3 = new Web3("https://ropsten.infura.io/v3/" + projectId);
+
+          console.log("4");
 
           // let web3 = new Web3(
           //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
@@ -274,16 +280,28 @@ class ZipSign extends React.Component {
             manifestHash: ethUtil.sha256(input.manifestContent).toString("hex")
           };
 
+          console.log("5");
+
           let fromAddress = ethUtil
             .privateToAddress(privateKeyBuffer)
             .toString("hex");
+
+          console.log("5.1");
           let transactionCount = await web3.eth.getTransactionCount(
-            fromAddress
+            fromAddress,
+            "pending"
           );
+
+          console.log("tx count " + transactionCount);
+          console.log("5.2");
+
+          console.log("6");
 
           let dataString = JSON.stringify(rawData);
           let dataBuffer = ethUtil.toBuffer(dataString);
           let dataHex = ethUtil.bufferToHex(dataBuffer);
+
+          console.log("7");
 
           let transactionParams = {
             nonce: "0x" + transactionCount.toString(16),
@@ -292,6 +310,8 @@ class ZipSign extends React.Component {
             // gasPrice: gasPriceHex,
             // gasLimit: gasLimit
           };
+
+          console.log("8");
           let estimatingTransaction = new EthereumTx(transactionParams);
           estimatingTransaction.sign(privateKeyBuffer);
           let baseFee = estimatingTransaction.getBaseFee().toNumber();
@@ -320,6 +340,7 @@ class ZipSign extends React.Component {
 
           let transactionHash = "0x" + serializedTransaction.toString("hex");
 
+          console.log("right before web3.eth.sendSignedTransaction()");
           web3.eth
             .sendSignedTransaction(transactionHash)
             .on("error", error => {

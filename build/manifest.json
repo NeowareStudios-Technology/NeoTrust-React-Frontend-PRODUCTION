@@ -1,6 +1,6 @@
 {
-  "short_name": "NeoTrust.io",
-  "name": "NeoTrust",
+  "short_name": "NeoPak.io",
+  "name": "NeoWare Package App",
   "icons": [
     {
       "src": "NeoWare.ico",
@@ -10,6 +10,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#fff",
-  "background_color": "#fff"
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
