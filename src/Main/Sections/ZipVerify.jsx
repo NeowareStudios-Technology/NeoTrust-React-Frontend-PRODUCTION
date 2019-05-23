@@ -193,7 +193,7 @@ class ZipVerify extends React.Component {
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neopak.sf") {
+                  if (name === "META-INF/sig-neotrust.sf") {
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
@@ -217,7 +217,7 @@ class ZipVerify extends React.Component {
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neopak.ec") {
+                  if (name === "META-INF/sig-neotrust.ec") {
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
@@ -367,9 +367,9 @@ class ZipVerify extends React.Component {
                 <>
                   {this.state.block ? (
                     <>
-                      <h3>NeoPak Verificiation Successful</h3>
+                      <h3>NeoTrust Verificiation Successful</h3>
                       <h4>
-                        NeoPak Timestamp:{" "}
+                        NeoTrust Timestamp:{" "}
                         {moment(this.state.block.timestamp * 1000).format(
                           "YYYY-MM-DD hh:mm:ss A"
                         )}
@@ -377,7 +377,7 @@ class ZipVerify extends React.Component {
                     </>
                   ) : (
                     <>
-                      <h3>NeoPak could not be verified.</h3>
+                      <h3>NeoTrust could not be verified.</h3>
                       <h4>
                         Ensure enough time has passed since transaction sent.
                       </h4>

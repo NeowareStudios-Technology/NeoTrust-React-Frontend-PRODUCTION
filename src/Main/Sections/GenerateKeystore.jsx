@@ -58,7 +58,7 @@ class GenerateKeystore extends React.Component {
       privateKey: "",
       keystoreObject: null,
       useSavedKeystoreFile: false,
-      fileName: "neopak",
+      fileName: "neotrust",
       files: [],
       filesContents: [],
       processing: false,
@@ -307,7 +307,7 @@ class GenerateKeystore extends React.Component {
       <div className={classes.container}>
         <Card>
           <CardHeader color="primary" className={classes.cardHeader}>
-            <h4>Generate Your NeoPak Id</h4>
+            <h4>Generate Your NeoTrust Id</h4>
           </CardHeader>
           <CardBody>
             <div>
@@ -316,7 +316,7 @@ class GenerateKeystore extends React.Component {
                   {this.state.keystoreObject ? (
                     <>
                       <div>
-                        <h3>NeoPak Id Successfully Generated</h3>
+                        <h3>NeoTrust Id Successfully Generated</h3>
                         <h4>
                           Use the keystore to access your testnet account and
                           add ether.
@@ -325,14 +325,14 @@ class GenerateKeystore extends React.Component {
                           You can now add Ether to your address using this
                           keystore file. Once your address has enough ether you
                           can come back and use this keystore file to create
-                          NeoPak files.
+                          NeoTrust files.
                         </h4>
                         <Button
                           variant="contained"
                           color="primary"
                           onClick={this.downloadKeystoreFile}
                         >
-                          Download NeoPak Id
+                          Download NeoTrust Id
                         </Button>
                       </div>
                     </>
@@ -367,7 +367,7 @@ class GenerateKeystore extends React.Component {
                                 color="primary"
                                 onClick={this.createKeystoreFile}
                               >
-                                Generating NeoPak Id
+                                Generating NeoTrust Id
                               </Button>
                             </>
                           ) : (
@@ -377,7 +377,7 @@ class GenerateKeystore extends React.Component {
                                 color="primary"
                                 onClick={this.createKeystoreFile}
                               >
-                                Generate NeoPak Id
+                                Generate NeoTrust Id
                               </Button>
                             </>
                           )}

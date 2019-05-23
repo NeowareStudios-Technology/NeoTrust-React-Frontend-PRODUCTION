@@ -90,7 +90,13 @@ class Component extends React.Component {
                       className="form-group"
                       style={{ marginBottom: "36px" }}
                     >
-                      <input type="file" onChange={this.onUpload} directory webkitdirectory multiple />
+                      <input
+                        type="file"
+                        onChange={this.onUpload}
+                        directory
+                        webkitdirectory
+                        multiple
+                      />
                       {this.state.errors && this.state.errors.archiveFile && (
                         <>
                           <p style={{ color: "red" }}>
@@ -257,7 +263,7 @@ class Component extends React.Component {
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neopak.sf") {
+                  if (name === "META-INF/sig-neotrust.sf") {
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
@@ -281,7 +287,7 @@ class Component extends React.Component {
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neopak.ec") {
+                  if (name === "META-INF/sig-neotrust.ec") {
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
