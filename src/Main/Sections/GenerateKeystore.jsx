@@ -55,6 +55,7 @@ class GenerateKeystore extends React.Component {
 
     this.state = {
       errors: {},
+      transactionError: "",
       password: "",
       publicKey: null,
       privateKeyData: null,
@@ -70,7 +71,8 @@ class GenerateKeystore extends React.Component {
       keystorePassword: "",
       creatingKeystoreFile: false,
       transactionHash: null,
-      validatingKeystoreFile: false
+      validatingKeystoreFile: false,
+      userName: ""
     };
   }
 
@@ -189,9 +191,12 @@ class GenerateKeystore extends React.Component {
       );
     });
 
+    //password and name validation
     sequence.promise(() => {
       let passwordValid = true;
       let password = this.state.password;
+      let userNameValid = true;
+      let userName = this.state.userName;
       if (!password) {
         passwordValid = false;
         sequence.errors.password = ["Please enter a password."];
@@ -204,7 +209,12 @@ class GenerateKeystore extends React.Component {
         }
       }
 
-      if (passwordValid) {
+      if (!userName) {
+        userNameValid = false;
+        sequence.errors.userName = ["Please enter your full name."];
+      }
+
+      if (passwordValid && userNameValid) {
         sequence.next();
       } else {
         sequence.stop();
@@ -250,7 +260,7 @@ class GenerateKeystore extends React.Component {
             toAddress = "0x" + toAddress;
 
             let rawData = {
-              userName: "bob"
+              userName: this.state.userName
             };
 
             let neoTrustPrivKeyBuffer = new Buffer([
@@ -493,6 +503,25 @@ class GenerateKeystore extends React.Component {
                   ) : (
                     <>
                       <div className="form-group mb-4">
+                        <TextField
+                          label="Name"
+                          type="text"
+                          placeholder="Enter your name for your NeoTrust ID."
+                          helperText="Enter your name for your NeoTrust ID."
+                          value={this.state.userName}
+                          onChange={e => {
+                            let value = e.target.value;
+                            this.setState({ userName: value });
+                          }}
+                          fullWidth
+                        />
+                        {this.state.errors && this.state.errors.userName && (
+                          <>
+                            <p style={{ color: "red" }}>
+                              {this.state.errors.userName[0]}
+                            </p>
+                          </>
+                        )}
                         <TextField
                           label="Password"
                           type="password"

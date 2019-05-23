@@ -92,6 +92,7 @@ class ZipVerify extends React.Component {
     return output;
   }
   verifyTransactionHash = async () => {
+    console.log("in verifyTransaction()");
     if (this.state.transactionHash) {
       let projectId = "16b625506d4a427b9548ed443b66858b";
       let web3 = new Web3(
@@ -101,43 +102,62 @@ class ZipVerify extends React.Component {
         )
       );
 
+      console.log("after assigning Web3.providers.WebsocketProvider");
+
       let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
 
       let transaction = await web3.eth.getTransaction(
         this.state.transactionHash
       );
+      console.log("1");
 
       if (transaction && typeof transaction.blockHash === "string") {
+        console.log("2");
         if (typeof transaction.input !== "undefined") {
+          console.log("3");
           let txDataString = this.cleanJsonString(
             this.hexToAscii(transaction.input)
           );
+
+          console.log(txDataString);
           try {
             let txData = JSON.parse(txDataString.trim());
+            console.log(
+              txData + " " + txData.publicKey + " " + txData.manifestHash
+            );
             if (
               txData &&
-              typeof txData.publicKey !== "undefined" &&
+              //typeof txData.publicKey !== "undefined" &&
               typeof txData.manifestHash !== "undefined"
             ) {
+              console.log("4");
               let publicKeyMatch = false;
               let manifestHashMatch = false;
-              if (this.state.publicKey === txData.publicKey) {
+              /*if (this.state.publicKey === txData.publicKey) {
+                console.log("5");
                 publicKeyMatch = true;
               }
+              */
               if (this.state.manifestHash === txData.manifestHash) {
+                console.log("6");
                 manifestHashMatch = true;
               }
 
-              if (publicKeyMatch && manifestHashMatch) {
+              if (manifestHashMatch) {
+                //(publicKeyMatch && manifestHashMatch) {
+                console.log("7");
                 let block = await web3.eth.getBlock(transaction.blockHash);
                 if (block) {
+                  console.log("8");
                   this.setState({
                     checkedTransaction: true,
                     block: block,
                     publicKeyMatch: true,
                     manifestHashMatch: true
                   });
+                  console.log("public key matched and manifest hash matched");
                 } else {
+                  console.log("could not get block info");
                   this.setState({
                     checkedTransaction: true,
                     block: null
@@ -173,6 +193,7 @@ class ZipVerify extends React.Component {
       sequence.signature = null;
       sequence.transactionHash = null;
 
+      ///////////////////////////READ THE META INF FILES///////////////////////////////////
       sequence.promise(() => {
         JSZip.loadAsync(this.state.archiveFile) // 1) read the Blob
           .then(
@@ -193,51 +214,67 @@ class ZipVerify extends React.Component {
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neotrust.sf") {
+                  if (name === "META-INF/neotrust.sf") {
+                    console.log("inside META-INF/sig-neotrust.sf logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.sfcontent = reader.result;
+                          console.log("sig-neotrust.sf read? " + reader.result);
                           sequence.next();
                         };
                         reader.readAsText(blob);
+                        console.log(
+                          "afer sig-neotrust.sf read? " + reader.result
+                        );
                       });
                     });
                   }
                   if (name === "META-INF/manifest.mf") {
+                    console.log("inside META-INF/manifest.mf logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.manifest = reader.result;
+                          console.log("manifest.mf read? " + reader.result);
                           sequence.next();
                         };
                         reader.readAsText(blob);
+                        console.log("after mainfest.mf read " + reader.result);
                       });
                     });
                   }
-                  if (name === "META-INF/sig-neotrust.ec") {
+                  if (name === "META-INF/neotrust.ec") {
+                    console.log("inside META-INF/sig-neotrust.ec logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.signature = new Uint8Array(reader.result);
+                          console.log("sig-neotrust.ec read? " + reader.result);
                           sequence.next();
                         };
                         reader.readAsArrayBuffer(blob);
+                        console.log(
+                          "after sig-neotrust.ec read " + reader.result
+                        );
                       });
                     });
                   }
                   if (name === "META-INF/tx.hash") {
+                    console.log("inside META-INF/tx.hash logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.transactionHash = reader.result;
+                          console.log("tx.hash read? " + reader.result);
                           sequence.next();
                         };
                         reader.readAsText(blob);
+                        console.log("after tx.hash read? " + reader.result);
                       });
                     });
                   }
@@ -248,6 +285,7 @@ class ZipVerify extends React.Component {
             function(e) {}
           );
       });
+      //^^^^^^^^^^^^^^^^^^^^^^^^^^^READ THE META INF FILES^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       sequence.onStop = () => {
         if (
@@ -256,6 +294,7 @@ class ZipVerify extends React.Component {
           sequence.signature &&
           sequence.transactionHash
         ) {
+          console.log("we are in the onStop() function");
           let fileHashes = [];
           let sfContentSections = sequence.sfcontent.split("\n\n");
           let sfContentLines = sequence.sfcontent.split("\n");
@@ -313,6 +352,7 @@ class ZipVerify extends React.Component {
                       manifestHash: manifestHash
                     },
                     () => {
+                      console.log("before calling verify transaction hash");
                       this.verifyTransactionHash();
                     }
                   );
