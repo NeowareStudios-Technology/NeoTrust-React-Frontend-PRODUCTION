@@ -38,6 +38,7 @@ import Web3 from "web3";
 import { debug } from "util";
 import { EXITED } from "react-transition-group/Transition";
 import { truncate } from "fs";
+import GoogleCloudFunctions from "../Api/GoogleCloudFunctions";
 var ReactDOMServer = require("react-dom/server");
 var ethUtil = require("ethereumjs-util");
 const EthereumTx = require("ethereumjs-tx");
@@ -208,12 +209,10 @@ class GenerateKeystore extends React.Component {
           ];
         }
       }
-
       if (!userName) {
         userNameValid = false;
         sequence.errors.userName = ["Please enter your full name."];
       }
-
       if (passwordValid && userNameValid) {
         sequence.next();
       } else {
@@ -221,6 +220,7 @@ class GenerateKeystore extends React.Component {
       }
     });
 
+    //creating private key
     sequence.promise(() => {
       this.createPrivateKeyData(privateKeyData => {
         if (privateKeyData) {
@@ -233,154 +233,36 @@ class GenerateKeystore extends React.Component {
       });
     });
 
-    //Lee 5/20/19
-    //send transaction from NeoTrust Ethereum address to users newly created NeoTrust ID (eth address)
-    sequence.promise(async (input, callback) => {
-      let privateKeyData = sequence.privateKeyData;
-      if (privateKeyData) {
-        let privateKeyBuffer = Buffer.from(privateKeyData.privateKey, "hex");
-        if (privateKeyBuffer) {
-          let privateKey = privateKeyBuffer.toString("hex");
-          if (privateKey) {
-            let projectId = "16b625506d4a427b9548ed443b66858b";
+    //contacting server for user to recieve ID cert
+    sequence.promise(async () => {
+      let userName = this.state.userName;
+      let privateKeyBuffer = sequence.privateKeyData.privateKey;
+      let address = ethUtil.privateToAddress(privateKeyBuffer).toString("hex");
+      address = "0x" + address;
 
-            let web3 = new Web3("https://ropsten.infura.io/v3/" + projectId);
+      console.log(address);
+      console.log(userName);
 
-            // let web3 = new Web3(
-            //   // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
-            //   new Web3.providers.WebsocketProvider(
-            //     "wss://ropsten.infura.io/ws/v3/" + projectId
-            //   )
-            // );
-
-            let toAddress = ethUtil
-              .privateToAddress(privateKeyBuffer)
-              .toString("hex");
-
-            toAddress = "0x" + toAddress;
-
-            let rawData = {
-              userName: this.state.userName
-            };
-
-            let neoTrustPrivKeyBuffer = new Buffer([
-              0x0e,
-              0x8b,
-              0xd7,
-              0xc0,
-              0xd1,
-              0x1f,
-              0x7b,
-              0xd3,
-              0x7b,
-              0xd9,
-              0x8f,
-              0xfd,
-              0x77,
-              0x5e,
-              0x45,
-              0xca,
-              0xe1,
-              0xcc,
-              0x4c,
-              0x7e,
-              0xc8,
-              0xe4,
-              0xbe,
-              0x3f,
-              0x9b,
-              0x4c,
-              0xd5,
-              0x53,
-              0xff,
-              0x8e,
-              0xf5,
-              0xbf
-            ]);
-
-            let fromAddress = ethUtil
-              .privateToAddress(neoTrustPrivKeyBuffer)
-              .toString("hex");
-
-            let transactionCount = await web3.eth.getTransactionCount(
-              fromAddress,
-              "pending"
-            );
-
-            let dataString = JSON.stringify(rawData);
-            let dataBuffer = ethUtil.toBuffer(dataString);
-            let dataHex = ethUtil.bufferToHex(dataBuffer);
-
-            let transactionParams = {
-              nonce: "0x" + transactionCount.toString(16),
-              to: toAddress,
-              data: dataHex
-            };
-            let estimatingTransaction = new EthereumTx(transactionParams);
-            estimatingTransaction.sign(neoTrustPrivKeyBuffer);
-            let baseFee = estimatingTransaction.getBaseFee().toNumber();
-
-            let gasPrice = 100000;
-            let gasPriceHex = "0x" + gasPrice.toString(16);
-            console.log("Gas Price", gasPriceHex);
-
-            let gasLimit = baseFee;
-            let gasLimitHex = "0x" + gasLimit.toString(16);
-            console.log("Gas Limit", gasLimitHex);
-
-            transactionParams.gasPrice = gasPriceHex;
-            transactionParams.gasLimit = gasLimitHex;
-            let transaction = new EthereumTx(transactionParams);
-            transaction.sign(neoTrustPrivKeyBuffer);
-
-            let transactionValid = transaction.validate();
-            console.log("Transaction Valid", transactionValid);
-            if (!transactionValid) {
-              let validationError = transaction.validate(true);
-              console.log("Validation Error", validationError);
-            }
-
-            const serializedTransaction = transaction.serialize();
-
-            let transactionHash = "0x" + serializedTransaction.toString("hex");
-
-            web3.eth
-              .sendSignedTransaction(transactionHash)
-              .on("error", error => {
-                let errorMessage =
-                  "We could not process your transaction.  Please kindly verify that the address associated with your keystore file has enough funds.";
-                if (
-                  typeof error === "object" &&
-                  typeof error.message !== "undefined"
-                ) {
-                  let messageParts = error.message.split(":");
-                  try {
-                    let messageObject = JSON.parse(messageParts[1].trim);
-                    if (
-                      messageObject &&
-                      typeof messageObject.message !== "undefined"
-                    ) {
-                      errorMessage =
-                        "We could not process your transaction. " +
-                        messageObject.message.charAt(0).toUpperCase() +
-                        messageObject.message.slice(1);
-                    }
-                  } catch (error) {}
-                }
-                this.setState({
-                  transactionError: errorMessage
-                });
-              })
-              .on("transactionHash", hash => {
-                this.setState({
-                  transactionHash: hash
-                });
-                console.log("ID certification transaction sent to new user");
-                console.log("transaction hash " + hash);
-                sequence.next();
-              });
+      //for production change the path to "/send-cert-transaction"
+      const response = await GoogleCloudFunctions.get(
+        "/send-cert-transaction-test",
+        {
+          params: {
+            address: address,
+            name: userName
           }
         }
+      );
+      console.log("Google Cloud Functions response code: " + response.status);
+
+      if (response.status == "200") {
+        sequence.next();
+      } else {
+        //still need to render this error somewhere on the page
+        sequence.errors.transactionError = [
+          "The ID certificate transaction could not be sent."
+        ];
+        sequence.stop();
       }
     });
 
