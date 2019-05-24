@@ -30,6 +30,7 @@ import Web3 from "web3";
 import moment from "moment";
 import { pubToAddress } from "ethereumjs-util";
 var ethUtil = require("ethereumjs-util");
+var crypto = require("crypto");
 const EthereumTx = require("ethereumjs-tx");
 const keythereum = require("keythereum");
 
@@ -42,7 +43,7 @@ class ZipVerify extends React.Component {
       errors: {},
       publicKey: null,
       address: null,
-      publicKeyMatch: false,
+      addressMatch: false,
       manifestHash: false,
       manifestHashMatch: false,
       archiveVerified: false,
@@ -94,7 +95,6 @@ class ZipVerify extends React.Component {
     return output;
   }
   verifyTransactionHash = async () => {
-    console.log("in verifyTransaction()");
     if (this.state.transactionHash) {
       let projectId = "16b625506d4a427b9548ed443b66858b";
       let web3 = new Web3(
@@ -103,8 +103,6 @@ class ZipVerify extends React.Component {
           "wss://ropsten.infura.io/ws/v3/" + projectId
         )
       );
-
-      console.log("after assigning Web3.providers.WebsocketProvider");
 
       let neoKeyAddress = "0xe8a1d3c35b644e14c9743296e10986be7141e706";
 
@@ -121,31 +119,28 @@ class ZipVerify extends React.Component {
           try {
             let txData = JSON.parse(txDataString.trim());
 
-            if (
-              txData &&
-              //typeof txData.publicKey !== "undefined" &&
-              typeof txData.manifestHash !== "undefined"
-            ) {
-              let publicKeyMatch = false;
+            //if the tx data contains a manifestHash
+            if (txData && typeof txData.manifestHash !== "undefined") {
+              let addressMatch = false;
               let manifestHashMatch = false;
-              /*if (this.state.publicKey === txData.publicKey) {
-                console.log("5");
-                publicKeyMatch = true;
+
+              //make sure from address of tx matches address derived from NeoTrust contained public key
+              if (this.state.address === transaction.from.toLowerCase()) {
+                addressMatch = true;
               }
-              */
+
+              //make sure manifest hash in tx data matches manifest hash contained in NeoTrust archive
               if (this.state.manifestHash === txData.manifestHash) {
                 manifestHashMatch = true;
               }
 
-              if (manifestHashMatch) {
-                //(publicKeyMatch && manifestHashMatch) {
-
+              if (addressMatch && manifestHashMatch) {
                 let block = await web3.eth.getBlock(transaction.blockHash);
                 if (block) {
                   this.setState({
                     checkedTransaction: true,
                     block: block,
-                    publicKeyMatch: true,
+                    addressMatch: true,
                     manifestHashMatch: true
                   });
                 } else {
@@ -273,7 +268,6 @@ class ZipVerify extends React.Component {
           sequence.signature &&
           sequence.transactionHash
         ) {
-          console.log("we are in the onStop() function");
           let fileHashes = [];
           let sfContentSections = sequence.sfcontent.split("\n\n");
           let sfContentLines = sequence.sfcontent.split("\n");
@@ -300,9 +294,18 @@ class ZipVerify extends React.Component {
             if (publicKeyLine) {
               let lineParts = publicKeyLine.split(":");
               let publicKey = lineParts[1].trim();
+              let publicKeyForAddress = publicKey.substring(2);
+
               let publicKeyBuffer = Buffer.from(publicKey, "hex");
-              let address = ethUtil.pubToAddress(publicKey);
-              console.log("address from sender's public key" + address);
+              let publicKeyForAddressBuffer = Buffer.from(
+                publicKeyForAddress,
+                "hex"
+              );
+
+              let address = ethUtil
+                .pubToAddress(publicKeyForAddressBuffer)
+                .toString("hex");
+              address = "0x" + address;
 
               let sfContentHash = ethUtil.sha256(sequence.sfcontent);
 
@@ -328,12 +331,12 @@ class ZipVerify extends React.Component {
                   this.setState(
                     {
                       publicKey: publicKey,
+                      address: address,
                       transactionHash: sequence.transactionHash,
                       verifiedFiles: sequence.files,
                       manifestHash: manifestHash
                     },
                     () => {
-                      console.log("before calling verify transaction hash");
                       this.verifyTransactionHash();
                     }
                   );
