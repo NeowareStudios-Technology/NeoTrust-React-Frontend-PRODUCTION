@@ -6,11 +6,7 @@
 // jshint esversion: 6
 
 import MainPage from "Main/Main.jsx";
-import VerifyPage from "./routes/verify";
 
-var indexRoutes = [
-  { path: "/verify", name: "VerifyPage", component: VerifyPage },
-  { path: "/", name: "MainPage", component: MainPage }
-];
+var indexRoutes = [{ path: "/", name: "MainPage", component: MainPage }];
 
 export default indexRoutes;
