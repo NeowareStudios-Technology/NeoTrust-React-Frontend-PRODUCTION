@@ -137,8 +137,6 @@ class ZipSign extends React.Component {
     let privateKeyData = this.state.privateKeyData;
     let publicKeyBuffer = null;
 
-    console.log(privateKeyData.privateKey.toString("hex"));
-
     if (privateKeyData) {
       if (files.length > 0) {
         let privateKeyBuffer = Buffer.from(privateKeyData.privateKey, "hex");
@@ -266,7 +264,8 @@ class ZipSign extends React.Component {
           //   )
           // );
 
-          let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
+          let neoKeyAddress = "0xe8a1d3c35b644e14c9743296e10986be7141e706";
+
           //Use hash of signature content instead of manifestContent and call it
           //signatureHash
           let rawData = {

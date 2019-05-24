@@ -28,6 +28,7 @@ import JSZip from "jszip";
 import JSZipUtils from "jszip-utils";
 import Web3 from "web3";
 import moment from "moment";
+import { pubToAddress } from "ethereumjs-util";
 var ethUtil = require("ethereumjs-util");
 const EthereumTx = require("ethereumjs-tx");
 const keythereum = require("keythereum");
@@ -40,6 +41,7 @@ class ZipVerify extends React.Component {
       files: [],
       errors: {},
       publicKey: null,
+      address: null,
       publicKeyMatch: false,
       manifestHash: false,
       manifestHashMatch: false,
@@ -104,33 +106,26 @@ class ZipVerify extends React.Component {
 
       console.log("after assigning Web3.providers.WebsocketProvider");
 
-      let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
+      let neoKeyAddress = "0xe8a1d3c35b644e14c9743296e10986be7141e706";
 
       let transaction = await web3.eth.getTransaction(
         this.state.transactionHash
       );
-      console.log("1");
 
       if (transaction && typeof transaction.blockHash === "string") {
-        console.log("2");
         if (typeof transaction.input !== "undefined") {
-          console.log("3");
           let txDataString = this.cleanJsonString(
             this.hexToAscii(transaction.input)
           );
 
-          console.log(txDataString);
           try {
             let txData = JSON.parse(txDataString.trim());
-            console.log(
-              txData + " " + txData.publicKey + " " + txData.manifestHash
-            );
+
             if (
               txData &&
               //typeof txData.publicKey !== "undefined" &&
               typeof txData.manifestHash !== "undefined"
             ) {
-              console.log("4");
               let publicKeyMatch = false;
               let manifestHashMatch = false;
               /*if (this.state.publicKey === txData.publicKey) {
@@ -139,25 +134,21 @@ class ZipVerify extends React.Component {
               }
               */
               if (this.state.manifestHash === txData.manifestHash) {
-                console.log("6");
                 manifestHashMatch = true;
               }
 
               if (manifestHashMatch) {
                 //(publicKeyMatch && manifestHashMatch) {
-                console.log("7");
+
                 let block = await web3.eth.getBlock(transaction.blockHash);
                 if (block) {
-                  console.log("8");
                   this.setState({
                     checkedTransaction: true,
                     block: block,
                     publicKeyMatch: true,
                     manifestHashMatch: true
                   });
-                  console.log("public key matched and manifest hash matched");
                 } else {
-                  console.log("could not get block info");
                   this.setState({
                     checkedTransaction: true,
                     block: null
@@ -215,66 +206,54 @@ class ZipVerify extends React.Component {
                     });
                   }
                   if (name === "META-INF/neotrust.sf") {
-                    console.log("inside META-INF/sig-neotrust.sf logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.sfcontent = reader.result;
-                          console.log("sig-neotrust.sf read? " + reader.result);
+
                           sequence.next();
                         };
                         reader.readAsText(blob);
-                        console.log(
-                          "afer sig-neotrust.sf read? " + reader.result
-                        );
+                        console.log();
                       });
                     });
                   }
                   if (name === "META-INF/manifest.mf") {
-                    console.log("inside META-INF/manifest.mf logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.manifest = reader.result;
-                          console.log("manifest.mf read? " + reader.result);
+
                           sequence.next();
                         };
                         reader.readAsText(blob);
-                        console.log("after mainfest.mf read " + reader.result);
                       });
                     });
                   }
                   if (name === "META-INF/neotrust.ec") {
-                    console.log("inside META-INF/sig-neotrust.ec logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.signature = new Uint8Array(reader.result);
-                          console.log("sig-neotrust.ec read? " + reader.result);
+
                           sequence.next();
                         };
                         reader.readAsArrayBuffer(blob);
-                        console.log(
-                          "after sig-neotrust.ec read " + reader.result
-                        );
                       });
                     });
                   }
                   if (name === "META-INF/tx.hash") {
-                    console.log("inside META-INF/tx.hash logic");
                     sequence.promise(() => {
                       file[1].async("blob").then(blob => {
                         let reader = new FileReader();
                         reader.onload = () => {
                           sequence.transactionHash = reader.result;
-                          console.log("tx.hash read? " + reader.result);
                           sequence.next();
                         };
                         reader.readAsText(blob);
-                        console.log("after tx.hash read? " + reader.result);
                       });
                     });
                   }
@@ -322,6 +301,8 @@ class ZipVerify extends React.Component {
               let lineParts = publicKeyLine.split(":");
               let publicKey = lineParts[1].trim();
               let publicKeyBuffer = Buffer.from(publicKey, "hex");
+              let address = ethUtil.pubToAddress(publicKey);
+              console.log("address from sender's public key" + address);
 
               let sfContentHash = ethUtil.sha256(sequence.sfcontent);
 
