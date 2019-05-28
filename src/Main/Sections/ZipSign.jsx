@@ -373,7 +373,7 @@ class ZipSign extends React.Component {
     metaFolder.file("tx.hash", this.state.transactionHash);
     Archive.archiveFiles(this.state.filesInArchive, zip);
     Archive.saveAs("neotrust.zip", zip, () => {
-      console.log("SAVED!");
+      console.log("neotrust generated");
     });
   };
 

@@ -66,11 +66,13 @@ class GenerateKeystore extends React.Component {
       fileName: "neotrust",
       files: [],
       filesContents: [],
+      certContent: "",
       processing: false,
       activeStep: 0,
       keystoreFileActiveTab: 0,
       keystorePassword: "",
-      creatingKeystoreFile: false,
+      createKeystoreFile: false,
+      createCertFile: false,
       transactionHash: null,
       validatingKeystoreFile: false,
       userName: ""
@@ -254,8 +256,10 @@ class GenerateKeystore extends React.Component {
         }
       );
       console.log("Google Cloud Functions response code: " + response.status);
+      console.log("Google Cloud Functions response data: " + response.data);
 
       if (response.status == "200") {
+        this.setState({ certContent: response.data });
         sequence.next();
       } else {
         //still need to render this error somewhere on the page
@@ -295,7 +299,9 @@ class GenerateKeystore extends React.Component {
                 privateKeyData: sequence.privateKeyData
               },
               () => {
-                this.downloadKeystoreFile();
+                this.downloadKeystoreAndCertZip();
+                //this.downloadKeystoreFile();
+                //this.downloadCertFile();
               }
             );
           }
@@ -315,6 +321,25 @@ class GenerateKeystore extends React.Component {
     sequence.next();
   };
 
+  downloadKeystoreAndCertZip = () => {
+    if (this.state.keystoreObject && this.state.certContent !== "") {
+      let zip = Archive.createZip();
+      let keystoreContent = JSON.stringify(this.state.keystoreObject);
+
+      zip.file(
+        "UTC--" +
+          new Date().toISOString() +
+          "--" +
+          this.state.keystoreObject.address,
+        keystoreContent
+      );
+      zip.file("NeoCert", this.state.certContent);
+      Archive.saveAs("neokey.zip", zip, () => {
+        console.log("neokey generated");
+      });
+    }
+  };
+
   downloadKeystoreFile = () => {
     if (this.state.keystoreObject) {
       try {
@@ -329,6 +354,22 @@ class GenerateKeystore extends React.Component {
         setTimeout(() => {
           this.setState({
             createKeystoreFile: false,
+            activeStep: 1
+          });
+        }, 500);
+      } catch (error) {}
+    }
+  };
+
+  downloadCertFile = () => {
+    if (this.state.certContent !== "") {
+      try {
+        var blob = new Blob([this.state.certContent], { type: "text/plain" });
+        var fileName = "NeoCert";
+        saveAs(blob, fileName);
+        setTimeout(() => {
+          this.setState({
+            createCertFile: false,
             activeStep: 1
           });
         }, 500);
