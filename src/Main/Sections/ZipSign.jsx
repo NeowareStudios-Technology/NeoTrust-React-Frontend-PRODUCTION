@@ -35,6 +35,7 @@ import { archiveFiles } from "Archive/Archive.js";
 import Archive from "../../Archive/Archive";
 import { saveAs } from "file-saver";
 import Web3 from "web3";
+import JSZip from "jszip";
 var ReactDOMServer = require("react-dom/server");
 var ethUtil = require("ethereumjs-util");
 const EthereumTx = require("ethereumjs-tx");
@@ -401,8 +402,31 @@ class ZipSign extends React.Component {
 
     sequence.promise(() => {
       if (this.state.archiveFile) {
-        var reader = new FileReader();
+        var uploadedZip = new JSZip();
 
+        /////////////////////////////////////CONTAINED///////////////////////////////////////////////////
+        uploadedZip.loadAsync(this.state.archiveFile).then(function(zip) {
+          Object.entries(zip.files).map(file => {
+            let filename = file[0];
+
+            if (filename !== "NeoCert") {
+              let keyFileContents = "";
+              file[1].async("blob").then(blob => {
+                let reader = new FileReader();
+                reader.onload = e => {
+                  keyFileContents = e.target.result;
+                  console.log(keyFileContents);
+                };
+                reader.readAsText(blob);
+              });
+            }
+          });
+        });
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        return;
+
+        var reader = new FileReader();
         reader.onload = e => {
           try {
             let keystoreData = JSON.parse(e.target.result);
