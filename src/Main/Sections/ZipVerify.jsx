@@ -94,12 +94,14 @@ class ZipVerify extends React.Component {
   verifyTransactionHash = async () => {
     if (this.state.transactionHash) {
       let projectId = "16b625506d4a427b9548ed443b66858b";
-      let web3 = new Web3(
+      /*let web3 = new Web3(
         // Replace YOUR-PROJECT-ID with a Project ID from your Infura Dashboard
         new Web3.providers.WebsocketProvider(
           "wss://ropsten.infura.io/ws/v3/" + projectId
         )
-      );
+      );*/
+
+      let web3 = new Web3("https://ropsten.infura.io/v3/" + projectId);
 
       let neoKeyAddress = "0x82586c14c316Bb21865416fea2677A4Dc4411170";
 
